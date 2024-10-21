@@ -80,43 +80,45 @@
 
 <h1 align="center">Tarefa 2</h1>
 
+
+<h2>Documentação Completa</h2>
 <p>
-    Este projeto usa <strong>Terraform</strong> para criar uma infraestrutura na AWS. Abaixo estão as instruções detalhadas para reproduzir o ambiente configurado e as melhorias implementadas para otimizar segurança, automação e escalabilidade.
+    Este projeto foi desenvolvido utilizando <strong>Terraform</strong> para criar e gerenciar uma infraestrutura automatizada na AWS. O objetivo principal foi provisionar uma instância EC2 com melhorias focadas em automação, segurança e escalabilidade. Abaixo, descrevo as melhorias implementadas e o raciocínio por trás de cada uma, além das instruções para que você possa reproduzir o ambiente.
 </p>
 
 <h3>Melhorias Implementadas</h3>
 
 <h4>1. Automação da Instalação do Nginx</h4>
 <p>
-    Adicionei um script no campo <code>user_data</code> da instância EC2, o qual instala e inicia automaticamente o servidor Nginx assim que a instância é criada.
+    Um dos primeiros ajustes foi adicionar um script no <code>user_data</code> da instância EC2 para que o Nginx seja instalado e iniciado automaticamente logo após a criação da instância. Isso foi feito diretamente no código Terraform, garantindo que o servidor web esteja pronto para uso sem que seja necessário fazer login na instância para configurá-lo manualmente.
 </p>
-<p><strong>Motivo:</strong> Essa automação garante que o servidor Nginx esteja pronto para uso logo após a criação da instância, economizando tempo e evitando a necessidade de configurações manuais.</p>
+<p><strong>Por que isso é útil?</strong> Automatizar esse processo ajuda a economizar tempo e evita a necessidade de intervenção manual logo após o provisionamento. Além disso, esse tipo de automação é essencial para ambientes de produção, onde a consistência e rapidez são importantes.</p>
 
-<h4>2. Medidas de Segurança</h4>
+<h4>2. Reforço na Segurança</h4>
 <p>
-    Configurei um grupo de segurança que permite apenas o tráfego essencial: SSH liberado para qualquer IP (para acesso remoto) e saída irrestrita. Regras específicas de portas foram aplicadas para limitar o tráfego.
+    O grupo de segurança da EC2 foi configurado para permitir apenas tráfego de SSH (porta 22) e bloquear todas as outras portas para acessos de entrada, mantendo todas as saídas liberadas. Também criei um par de chaves SSH que será usado para acessar a instância com segurança.
 </p>
-<p><strong>Motivo:</strong> Essa abordagem melhora a segurança da instância EC2, garantindo que ela esteja protegida contra acessos indevidos, mantendo apenas as portas estritamente necessárias abertas.</p>
+<p><strong>Por que isso é importante?</strong> Limitar o tráfego de entrada a apenas o necessário (neste caso, SSH) minimiza as superfícies de ataque, aumentando a segurança do servidor. O uso de chaves SSH, em vez de senhas, garante uma camada extra de proteção contra acessos não autorizados.</p>
 
 <h4>3. Grupos de Dimensionamento Automático (Auto Scaling)</h4>
 <p>
-    Foi implementado um <strong>Auto Scaling Group (ASG)</strong> que ajusta automaticamente o número de instâncias EC2 de acordo com a demanda, baseado no uso da CPU.
+    Para garantir que o ambiente possa se ajustar automaticamente conforme o uso, configurei um <strong>Auto Scaling Group (ASG)</strong>. Ele aumenta ou reduz a quantidade de instâncias EC2 com base no uso de CPU.
 </p>
-<p><strong>Motivo:</strong> O uso de ASG permite que a infraestrutura responda a picos de uso, mantendo o sistema escalável e econômico ao reduzir as instâncias durante períodos de baixa demanda.</p>
+<p><strong>Vantagens:</strong> Essa configuração é essencial para ambientes com variações de demanda. Quando o tráfego ou a carga de trabalho aumenta, novas instâncias são automaticamente criadas. Quando a demanda diminui, as instâncias extras são removidas, ajudando a reduzir custos.</p>
 
-<h4>4. Balanceador de Carga (Load Balancer)</h4>
+<h4>4. Balanceamento de Carga</h4>
 <p>
-    Um <strong>Load Balancer</strong> foi configurado para distribuir o tráfego entre as instâncias EC2, assegurando alta disponibilidade e balanceamento de carga eficiente.
+    Também configurei um <strong>Load Balancer</strong> para distribuir o tráfego entre as instâncias EC2. O Load Balancer assegura que, conforme mais instâncias EC2 são criadas ou removidas pelo Auto Scaling, o tráfego seja distribuído de maneira eficiente e uniforme.
 </p>
-<p><strong>Motivo:</strong> O Load Balancer garante que o tráfego seja distribuído de forma uniforme entre as instâncias, evitando sobrecarga em um único servidor e aumentando a resiliência do ambiente.</p>
+<p><strong>Por que é essencial?</strong> O Load Balancer garante que o sistema continue respondendo adequadamente mesmo sob carga elevada. Isso aumenta a disponibilidade e confiabilidade da aplicação.</p>
 
 <h2>Instruções de Uso</h2>
 
 <h3>Pré-requisitos</h3>
 <ul>
-    <li>Conta AWS com permissões para criar instâncias EC2, VPCs, Auto Scaling e Load Balancer.</li>
-    <li>Terraform instalado na sua máquina (siga <a href="https://learn.hashicorp.com/tutorials/terraform/install-cli" target="_blank">essas instruções</a> para instalação).</li>
-    <li>Uma chave SSH gerada no seu sistema para acesso às instâncias EC2.</li>
+    <li>Uma conta AWS com permissões para criar recursos como EC2, VPC, Auto Scaling e Load Balancer.</li>
+    <li>Terraform instalado em sua máquina (<a href="https://learn.hashicorp.com/tutorials/terraform/install-cli" target="_blank">guia de instalação</a>).</li>
+    <li>Chave SSH gerada localmente para acessar a instância EC2.</li>
 </ul>
 
 <h3>Passos para Configuração</h3>
@@ -127,46 +129,46 @@
 cd seu-repositorio</code></pre>
 
     <li><strong>Inicialize o Terraform:</strong></li>
-    <p>Primeiro, execute o comando de inicialização do Terraform:</p>
+    <p>Execute o comando a seguir para inicializar o ambiente Terraform:</p>
     <pre><code>terraform init</code></pre>
 
     <li><strong>Verifique o plano de execução:</strong></li>
-    <p>Use o comando abaixo para visualizar o plano do que será criado:</p>
+    <p>Antes de aplicar as configurações, verifique o plano com o comando abaixo:</p>
     <pre><code>terraform plan</code></pre>
 
     <li><strong>Aplique as configurações:</strong></li>
-    <p>Para criar a infraestrutura na AWS, execute:</p>
+    <p>Agora, crie a infraestrutura rodando o comando:</p>
     <pre><code>terraform apply</code></pre>
-    <p>O Terraform pedirá uma confirmação antes de prosseguir. Digite <code>yes</code> para continuar.</p>
+    <p>Ao ser solicitado, confirme digitando <code>yes</code>.</p>
 
-    <li><strong>Acesse a instância EC2:</strong></li>
-    <p>Assim que a instância for criada, use o comando abaixo para acessá-la via SSH:</p>
+    <li><strong>Acesse a instância EC2 via SSH:</strong></li>
+    <p>Depois que a instância for criada, você pode acessá-la via SSH com o seguinte comando:</p>
     <pre><code>ssh -i path/to/your/key.pem ec2-user@<endereço-ip-público></code></pre>
 
-    <li><strong>Verifique Auto Scaling e Load Balancer:</strong></li>
-    <p>O Auto Scaling e o Load Balancer estarão configurados para ajustar e distribuir o tráfego automaticamente entre as instâncias EC2.</p>
+    <li><strong>Verifique o Auto Scaling e Load Balancer:</strong></li>
+    <p>O Auto Scaling e o Load Balancer já estarão configurados e operando, ajustando o número de instâncias EC2 e gerenciando o tráfego automaticamente.</p>
 </ol>
 
-<h3>Comandos Úteis</h3>
+<h3>Comandos Adicionais</h3>
 <ul>
-    <li><strong>Destruir a infraestrutura:</strong></li>
-    <p>Se quiser remover todos os recursos criados, execute:</p>
+    <li><strong>Para destruir a infraestrutura:</strong></li>
+    <p>Se você quiser remover todos os recursos criados, execute o seguinte comando:</p>
     <pre><code>terraform destroy</code></pre>
 </ul>
 
 <h2>Resultados Esperados</h2>
 <p>
-    Após seguir as instruções, a infraestrutura provisionada incluirá:
+    Ao aplicar estas configurações, você terá a seguinte infraestrutura funcionando:
 </p>
 <ul>
-    <li>Instância EC2 com Nginx instalado e em funcionamento.</li>
-    <li>Grupo de segurança com regras de tráfego apropriadas.</li>
-    <li>Auto Scaling ajustando a quantidade de instâncias EC2 conforme a demanda.</li>
-    <li>Balanceador de carga distribuindo tráfego de forma eficiente entre as instâncias.</li>
+    <li>Instância EC2 com o servidor Nginx rodando automaticamente.</li>
+    <li>Grupo de segurança configurado para permitir acesso apenas via SSH.</li>
+    <li>Auto Scaling ajustando o número de instâncias conforme a demanda de uso da CPU.</li>
+    <li>Load Balancer gerenciando o tráfego e garantindo alta disponibilidade.</li>
 </ul>
 <p>
-    O objetivo dessas melhorias é garantir uma infraestrutura escalável, segura e eficiente, pronta para atender às demandas de produção.
+    Com essas configurações, esperamos um ambiente seguro, automatizado e escalável, pronto para ser usado em produção ou ambientes de teste com alta demanda.
 </p>
-</body>
+
 
 
