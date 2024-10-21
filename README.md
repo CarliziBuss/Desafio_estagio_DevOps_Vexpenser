@@ -1,45 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Desafio VExpenses| Estágio DevOps</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-                line-height: 1.6;
-                background-color: #f4f4f4;
-            
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio VExpenses | Estágio DevOps</title>
+</head>
        
-            h1 {
-                color: #058eff;
-                text-transform: uppercase;
-             
-
-            }
-            h2 {
-                color: #666;
-            }
-
-            code {
-                background-color: #eaeaea;
-                padding: 2px 4px;
-                border-radius: 4px;
-            }
-            pre {
-                background-color: #eaeaea;
-                padding: 10px;
-                border-radius: 4px;
-                overflow-x: auto;
-            }
-        </style>
-    </head>
 <body>
-    <h1 style="font-size: 36px; font-family: Arial, sans-serif; color: yellow; text-align: center; margin: 50px; padding: 20px; background-color: #007BFF; border-radius: 10px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);">
-        <span style="color: rgb(255, 255, 255);">Desafio VExpenses |</span> <span style="color: yellow;">Estágio DevOps</span>
-    </h1>
+    <h1>Desafio VExpenses |Estágio DevOps </h1>
 
 <h1 align="center">Tarefa 1</h1>
 <h2>Descrição Técnica do Código Recebido:</h2>
@@ -113,57 +81,93 @@
 
 <h1 align="center">Tarefa 2</h1>
 
-    <h2>Modificação e Melhoria do Código</h2>
-    <p>Objetivo: implementar melhorias na infraestrutura de TI utilizando AWS e Terraform.</p>
+<p>
+    Este projeto usa <strong>Terraform</strong> para criar uma infraestrutura na AWS. Abaixo estão as instruções detalhadas para reproduzir o ambiente configurado e as melhorias implementadas para otimizar segurança, automação e escalabilidade.
+</p>
 
-    <h2>Melhorias Implementadas</h2>
-    <ul>
-        <li><strong>Segurança Aprimorada:</strong> Limitação do acesso SSH a um IP específic, reduzindo a exposição ao risco.</li>
-        <li><strong>Automação do Nginx:</strong> Configuração automática do servidor Nginx na instância EC2 após sua criação, garantindo que o serviço esteja pronto para uso sem intervenção manual.</li>
-        <li><strong>Grupos de Dimensionamento Automático:</strong> Implementação de um grupo de autoescalonamento que ajusta o número de instâncias EC2 entre 1 e 3, com base na demanda.</li>
-        <li><strong>Balanceador de Carga:</strong> Integração de um balanceador de carga para distribuir o tráfego entre as instâncias, melhorando a disponibilidade e desempenho da aplicação.</li>
-    </ul>
+<h3>Melhorias Implementadas</h3>
 
-    <h2>Detalhes Técnicos das Alterações</h2>
-    <h3>1. Segurança Aprimorada</h3>
-    <p>Foi configurado o grupo de segurança para restringir o acesso SSH a um IP específico, garantindo maior proteção contra acessos indesejados.</p>
-    
-    <h3>2. Automação do Nginx</h3>
-    <pre><code>
-    user_data = <<-EOF
-                #!/bin/bash
-                apt-get update -y
-                apt-get upgrade -y
-                apt-get install nginx -y
-                systemctl start nginx
-                systemctl enable nginx
-                EOF
-    </code></pre>
+<h4>1. Automação da Instalação do Nginx</h4>
+<p>
+    Adicionei um script no campo <code>user_data</code> da instância EC2, o qual instala e inicia automaticamente o servidor Nginx assim que a instância é criada.
+</p>
+<p><strong>Motivo:</strong> Essa automação garante que o servidor Nginx esteja pronto para uso logo após a criação da instância, economizando tempo e evitando a necessidade de configurações manuais.</p>
 
-    <h3>3. Grupos de Dimensionamento Automático</h3>
-    <p>Um grupo de autoescalonamento foi criado para garantir que a infraestrutura se adapte automaticamente à demanda, ajustando o número de instâncias EC2 conforme necessário.</p>
+<h4>2. Medidas de Segurança</h4>
+<p>
+    Configurei um grupo de segurança que permite apenas o tráfego essencial: SSH liberado para qualquer IP (para acesso remoto) e saída irrestrita. Regras específicas de portas foram aplicadas para limitar o tráfego.
+</p>
+<p><strong>Motivo:</strong> Essa abordagem melhora a segurança da instância EC2, garantindo que ela esteja protegida contra acessos indevidos, mantendo apenas as portas estritamente necessárias abertas.</p>
 
-    <h3>4. Balanceador de Carga</h3>
-    <p>Um balanceador de carga foi configurado para gerenciar o tráfego, garantindo que as solicitações sejam distribuídas entre as instâncias em execução.</p>
+<h4>3. Grupos de Dimensionamento Automático (Auto Scaling)</h4>
+<p>
+    Foi implementado um <strong>Auto Scaling Group (ASG)</strong> que ajusta automaticamente o número de instâncias EC2 de acordo com a demanda, baseado no uso da CPU.
+</p>
+<p><strong>Motivo:</strong> O uso de ASG permite que a infraestrutura responda a picos de uso, mantendo o sistema escalável e econômico ao reduzir as instâncias durante períodos de baixa demanda.</p>
 
-    <h2>Resultados Esperados</h2>
-    <ul>
-        <li><strong>Segurança:</strong> A aplicação estará protegida contra acessos indesejados via SSH.</li>
-        <li><strong>Escalabilidade:</strong> O grupo de dimensionamento automático permitirá que a aplicação escale conforme a demanda.</li>
-        <li><strong>Automação:</strong> O Nginx será instalado e configurado automaticamente.</li>
-        <li><strong>Distribuição de Carga:</strong> O balanceador de carga otimizará o desempenho da aplicação.</li>
-    </ul>
+<h4>4. Balanceador de Carga (Load Balancer)</h4>
+<p>
+    Um <strong>Load Balancer</strong> foi configurado para distribuir o tráfego entre as instâncias EC2, assegurando alta disponibilidade e balanceamento de carga eficiente.
+</p>
+<p><strong>Motivo:</strong> O Load Balancer garante que o tráfego seja distribuído de forma uniforme entre as instâncias, evitando sobrecarga em um único servidor e aumentando a resiliência do ambiente.</p>
 
-    <h2>Instruções de Uso</h2>
-    <p>Para inicializar e aplicar a configuração Terraform, siga os passos abaixo:</p>
-    <ol>
-        <li>Certifique-se de que o <strong>Terraform</strong> está instalado em sua máquina. Você pode baixar a versão mais recente do Terraform no <a href="https://www.terraform.io/downloads.html" target="_blank">site oficial do Terraform</a>.</li>
-        <li>Configure suas credenciais AWS. Certifique-se de que você tem as permissões necessárias para criar recursos na AWS.</li>
-        <li>Clone o repositório e navegue até o diretório do projeto.</li>
-        <li>Execute <code>terraform init</code> para inicializar o diretório do Terraform e baixar os provedores necessários.</li>
-        <li>Execute <code>terraform plan</code> para visualizar as mudanças que serão aplicadas na infraestrutura.</li>
-        <li>Execute <code>terraform apply</code> para criar os recursos na AWS. Você será solicitado a confirmar a aplicação.</li>
-    </ol>
-    <p>Após a conclusão, você poderá acessar os recursos criados e verificar se a infraestrutura está funcionando conforme o esperado.</p>
+<h2>Instruções de Uso</h2>
+
+<h3>Pré-requisitos</h3>
+<ul>
+    <li>Conta AWS com permissões para criar instâncias EC2, VPCs, Auto Scaling e Load Balancer.</li>
+    <li>Terraform instalado na sua máquina (siga <a href="https://learn.hashicorp.com/tutorials/terraform/install-cli" target="_blank">essas instruções</a> para instalação).</li>
+    <li>Uma chave SSH gerada no seu sistema para acesso às instâncias EC2.</li>
+</ul>
+
+<h3>Passos para Configuração</h3>
+
+<ol>
+    <li><strong>Clone o repositório:</strong></li>
+    <pre><code>git clone https://github.com/seu-usuario/seu-repositorio.git
+cd seu-repositorio</code></pre>
+
+    <li><strong>Inicialize o Terraform:</strong></li>
+    <p>Primeiro, execute o comando de inicialização do Terraform:</p>
+    <pre><code>terraform init</code></pre>
+
+    <li><strong>Verifique o plano de execução:</strong></li>
+    <p>Use o comando abaixo para visualizar o plano do que será criado:</p>
+    <pre><code>terraform plan</code></pre>
+
+    <li><strong>Aplique as configurações:</strong></li>
+    <p>Para criar a infraestrutura na AWS, execute:</p>
+    <pre><code>terraform apply</code></pre>
+    <p>O Terraform pedirá uma confirmação antes de prosseguir. Digite <code>yes</code> para continuar.</p>
+
+    <li><strong>Acesse a instância EC2:</strong></li>
+    <p>Assim que a instância for criada, use o comando abaixo para acessá-la via SSH:</p>
+    <pre><code>ssh -i path/to/your/key.pem ec2-user@<endereço-ip-público></code></pre>
+
+    <li><strong>Verifique Auto Scaling e Load Balancer:</strong></li>
+    <p>O Auto Scaling e o Load Balancer estarão configurados para ajustar e distribuir o tráfego automaticamente entre as instâncias EC2.</p>
+</ol>
+
+<h3>Comandos Úteis</h3>
+<ul>
+    <li><strong>Destruir a infraestrutura:</strong></li>
+    <p>Se quiser remover todos os recursos criados, execute:</p>
+    <pre><code>terraform destroy</code></pre>
+</ul>
+
+<h2>Resultados Esperados</h2>
+<p>
+    Após seguir as instruções, a infraestrutura provisionada incluirá:
+</p>
+<ul>
+    <li>Instância EC2 com Nginx instalado e em funcionamento.</li>
+    <li>Grupo de segurança com regras de tráfego apropriadas.</li>
+    <li>Auto Scaling ajustando a quantidade de instâncias EC2 conforme a demanda.</li>
+    <li>Balanceador de carga distribuindo tráfego de forma eficiente entre as instâncias.</li>
+</ul>
+<p>
+    O objetivo dessas melhorias é garantir uma infraestrutura escalável, segura e eficiente, pronta para atender às demandas de produção.
+</p>
 </body>
-</html>
+
+
